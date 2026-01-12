@@ -1471,18 +1471,33 @@
         <div class="content-area">
             <!-- Dashboard Page -->
             <div id="dashboard" class="page-content active">
+                <!-- Calendar Type Switcher -->
+                <div style="background: white; padding: 20px 25px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <span style="font-size: 14px; font-weight: 500; color: var(--text-gray);">Tampilkan:</span>
+                            <select id="calendarTypeSwitcher" onchange="switchCalendarType()" 
+                                    style="padding: 12px 20px; border: 2px solid #E5E7EB; border-radius: 10px; font-size: 15px; font-weight: 600; color: var(--text-dark); background: white; cursor: pointer; min-width: 300px; transition: all 0.2s;"
+                                    onfocus="this.style.borderColor='var(--primary)'"
+                                    onblur="this.style.borderColor='#E5E7EB'">
+                                <option value="kegiatan">📅 Jadwal Kegiatan</option>
+                                <option value="rencana-aksi">🎯 Jadwal Rencana Aksi Budaya Kerja</option>
+                            </select>
+                        </div>
+                        <div id="calendarTypeStatus" style="padding: 8px 16px; background: var(--bg-cream); border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text-gray);">
+                            <!-- Status will be updated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Calendar Section -->
                 <div class="calendar-section fade-in">
                     <div class="section-header">
-                        <h2 class="section-title">
+                        <h2 class="section-title" id="calendarSectionTitle">
                             <span class="title-icon">📅</span>
                             Jadwal Kegiatan
                         </h2>
-                        <div style="display: flex; gap: 12px;">
-                            <button class="btn-secondary" onclick="openUploadModal()" style="display: flex; align-items: center; gap: 8px; padding: 10px 20px;">
-                                <span>📤</span>
-                                <span>Upload Excel</span>
-                            </button>
+                        <div style="display: flex; gap: 12px;" id="calendarActionButtons">
                             <button class="btn-primary" onclick="openAddModal()" id="btnAddEvent" style="display: flex; align-items: center; gap: 8px;">
                                 <span>➕</span>
                                 <span>Tambah Kegiatan</span>
@@ -1493,28 +1508,50 @@
                         <!-- Status will be populated by JavaScript -->
                     </div>
 
-                    <!-- Dashboard Monitoring -->
-                    <div class="dashboard-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
-                        <div class="stat-card-mini">
-                            <div class="stat-icon-mini">📋</div>
-                            <div class="stat-content-mini">
-                                <h3 id="totalActivities">0</h3>
-                                <p>Total Kegiatan</p>
+                    <!-- Monitoring Kegiatan Tim (Hanya untuk Jadwal Kegiatan) -->
+                    <div id="monitoringSection" style="background: white; padding: 25px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 25px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                            <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: var(--text-dark);">
+                                📊 Monitoring Kegiatan Tim
+                            </h3>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <label style="font-size: 14px; color: var(--text-gray); font-weight: 500;">Pilih Tim:</label>
+                                <select id="teamSelector" onchange="updateSelectedTeamMonitoring()" 
+                                        style="padding: 10px 16px; border: 2px solid #E5E7EB; border-radius: 10px; font-size: 14px; font-weight: 500; color: var(--text-dark); background: white; cursor: pointer; min-width: 200px; transition: all 0.2s;"
+                                        onfocus="this.style.borderColor='var(--primary)'"
+                                        onblur="this.style.borderColor='#E5E7EB'">
+                                    <option value="">-- Pilih Tim --</option>
+                                    <option value="Subbag Umum">Subbag Umum</option>
+                                    <option value="Duknaker Kesra">Duknaker Kesra</option>
+                                    <option value="Pertanian">Pertanian</option>
+                                    <option value="Ekonomi">Ekonomi</option>
+                                    <option value="IPDS">IPDS</option>
+                                    <option value="UKK">UKK</option>
+                                    <option value="Hansos & Analisis">Hansos & Analisis</option>
+                                    <option value="Neraca">Neraca</option>
+                                    <option value="Harga">Harga</option>
+                                    <option value="PSS RB">PSS RB</option>
+                                </select>
                             </div>
                         </div>
-                        <div class="stat-card-mini">
-                            <div class="stat-icon-mini">👥</div>
-                            <div class="stat-content-mini">
-                                <h3 id="activeTeams">0</h3>
-                                <p>Tim Aktif</p>
+                        
+                        <!-- Team Monitoring Content -->
+                        <div id="teamMonitoringContent">
+                            <div style="text-align: center; padding: 80px 20px; color: var(--text-gray);">
+                                <div style="font-size: 64px; margin-bottom: 15px;">📋</div>
+                                <p style="font-size: 16px; font-weight: 500; margin: 0;">Pilih tim untuk melihat monitoring kegiatan</p>
+                                <p style="font-size: 14px; margin-top: 8px; color: #9CA3AF;">Gunakan dropdown di atas untuk memilih tim</p>
                             </div>
                         </div>
-                        <div class="stat-card-mini">
-                            <div class="stat-icon-mini">⏰</div>
-                            <div class="stat-content-mini">
-                                <h3 id="upcomingActivities">0</h3>
-                                <p>Kegiatan Mendatang</p>
-                            </div>
+                    </div>
+                    
+                    <!-- Reminder Rencana Aksi (Hanya untuk Jadwal Rencana Aksi) -->
+                    <div id="reminderSection" style="display: none; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 25px;">
+                        <h3 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: var(--text-dark);">
+                            🔔 Reminder Rencana Aksi Minggu Ini
+                        </h3>
+                        <div id="reminderContent">
+                            <!-- Will be populated by JavaScript -->
                         </div>
                     </div>
 
@@ -1673,7 +1710,7 @@
                             <p class="access-description">Laporan kinerja bulanan</p>
                         </a>
 
-                        <a href="https://bpssumbawa.github.io/masako/" target="_blank" class="access-card">
+                        <a href="https://amatseno13.github.io/masako/" target="_blank" class="access-card">
                             <div class="access-icon">📊</div>
                             <h3 class="access-title">SAKIP</h3>
                             <p class="access-description">Akuntabilitas kinerja</p>
@@ -1721,7 +1758,7 @@
                             </div>
                         </a>
 
-                        <a href="https://script.google.com/macros/s/AKfycbxPmOeeoKz0iU6ABoHQZb8APIkOgOQFw_ThOFwY0Q0-CBGUBGPO79gfxrrTDaeBEonTpA/exec" target="_blank" class="document-item">
+                        <a href="https://script.google.com/macros/s/AKfycbxSjQR3xy39lL4EnlSviTKcB9n2so9mKSrJfjeceHATVqXiDRTT7093NjsdcjvgPMvB8g/exec" target="_blank" class="document-item">
                             <div class="document-icon">🔢</div>
                             <div class="document-name">Nomor Surat</div>
                             <div class="document-meta">
@@ -2877,10 +2914,9 @@
         // ========================================
         // GOOGLE CALENDAR API CONFIGURATION
         // ========================================
-        // TODO: Paste your API Key from Google Cloud Console here
         const GOOGLE_API_KEY = 'AIzaSyDs6uykI_-bIYwUNGJdvKCtXKlUqVWDOQw';
         
-        // TODO: Paste your 10 Calendar IDs from Google Calendar here
+        // Calendar IDs untuk Kegiatan Tim
         const CALENDAR_IDS = {
             "Subbag Umum": "0b7e052cdca7d327672f47c1a411041ea27a3c7ea1993b88fe6dfed282361f42@group.calendar.google.com",
             "Duknaker Kesra": "a578551805dc4b23479a9f38682b48fed012e2f81204cad7322e69cb69d471a9@group.calendar.google.com",
@@ -2894,14 +2930,19 @@
             "PSS RB": "22c221f3a549d3b19db7a6fb33a8cffb187712ae096410dd5392d500717d7519@group.calendar.google.com"
         };
         
-        const USE_GOOGLE_CALENDAR = (GOOGLE_API_KEY !== 'AIzaSyDs6uykI_-bIYwUNGJdvKCtXKlUqVWDOQw');
+        // Calendar ID untuk Rencana Aksi Budaya Kerja
+        const RENCANA_AKSI_CALENDAR_ID = "38c16f3f419c21d625251b5f6936fa3f1f0a767c73b49da83c680e0eeee450b3@group.calendar.google.com";
+        
+        const USE_GOOGLE_CALENDAR = true; // API Key & Calendar IDs configured!
         const USE_CALENDAR_API = false; // Old Google Sheets API disabled
 
         // ========================================
         // CALENDAR GLOBAL VARIABLES
         // ========================================
         let currentCalendarDate = new Date();
-        let allActivities = [];
+        let allActivities = []; // For Kegiatan Tim
+        let allRencanaAksi = []; // For Rencana Aksi
+        let currentCalendarType = 'kegiatan'; // 'kegiatan' or 'rencana-aksi'
 
         const teams = [
             "Subbag Umum", "Duknaker Kesra", "Pertanian", "Ekonomi", "IPDS",
@@ -2932,7 +2973,7 @@
         
         async function loadCalendarActivities() {
             // Try Google Calendar first
-            if (USE_GOOGLE_CALENDAR && GOOGLE_API_KEY !== 'AIzaSyDs6uykI_-bIYwUNGJdvKCtXKlUqVWDOQw') {
+            if (USE_GOOGLE_CALENDAR && GOOGLE_API_KEY) {
                 const success = await loadEventsFromGoogleCalendar();
                 if (success) {
                     return true;
@@ -2950,7 +2991,7 @@
         // ========================================
         
         async function loadEventsFromGoogleCalendar() {
-            if (!USE_GOOGLE_CALENDAR || GOOGLE_API_KEY === 'AIzaSyDs6uykI_-bIYwUNGJdvKCtXKlUqVWDOQw') {
+            if (!USE_GOOGLE_CALENDAR || !GOOGLE_API_KEY) {
                 return false;
             }
             
@@ -3026,52 +3067,46 @@
             }
         }
 
+        // Google Sheets API removed - not used for calendar anymore
         async function saveToCalendarAPI(activity) {
-            if (!USE_CALENDAR_API || !CALENDAR_API_URL) {
-                console.warn('[Calendar] API not configured');
-                return false;
+            return false; // Deprecated
+        }
+
+        // DELETE KEGIATAN FUNCTION
+        function deleteActivity(activityIndex) {
+            if (confirm('⚠️ Hapus kegiatan ini?\n\nData akan dihapus permanen dari browser.')) {
+                allActivities.splice(activityIndex, 1);
+                saveToLocalStorage();
+                renderSamawaCalendar();
+                closeDayModal();
+                alert('✅ Kegiatan berhasil dihapus!');
             }
-            
-            try {
-                console.log('[Calendar] Saving to API:', activity);
-                
-                const response = await fetch(`${AIzaSyDs6uykI_-bIYwUNGJdvKCtXKlUqVWDOQw}?action=add`, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(activity)
-                });
-                
-                console.log('[Calendar] Save response status:', response.status);
-                
-                if (!response.ok) {
-                    console.error('[Calendar] HTTP Error:', response.status, response.statusText);
-                    return false;
-                }
-                
-                const text = await response.text();
-                console.log('[Calendar] Save response text:', text);
-                
-                const result = JSON.parse(text);
-                console.log('[Calendar] Save result:', result);
-                
-                if (result.status === 'success') {
-                    console.log('[Calendar] ✅ Saved to API successfully');
-                    return true;
-                } else {
-                    console.error('[Calendar] API returned error:', result.message);
-                    return false;
-                }
-            } catch (error) {
-                console.error('[Calendar] ❌ Failed to save to API:', error);
-                return false;
+        }
+        
+        function deleteRencanaAksi(index) {
+            if (confirm('⚠️ Hapus rencana aksi ini?\n\nData akan dihapus permanen dari browser.')) {
+                allRencanaAksi.splice(index, 1);
+                saveRencanaAksiToLocalStorage();
+                updateReminderSection();
+                renderSamawaCalendar();
+                closeDayModal();
+                alert('✅ Rencana Aksi berhasil dihapus!');
             }
         }
 
         function saveToLocalStorage() {
             localStorage.setItem('samawa_activities', JSON.stringify(allActivities));
+        }
+        
+        function saveRencanaAksiToLocalStorage() {
+            localStorage.setItem('samawa_rencana_aksi', JSON.stringify(allRencanaAksi));
+        }
+        
+        function loadRencanaAksiFromLocalStorage() {
+            const stored = localStorage.getItem('samawa_rencana_aksi');
+            if (stored) {
+                allRencanaAksi = JSON.parse(stored);
+            }
         }
 
         // ========================================
@@ -3124,19 +3159,34 @@
             if (events.length > 0 && !isOtherMonth) {
                 div.classList.add('has-event');
                 
-                // Add colored badges for each team
-                const eventBadges = events.map(event => {
-                    const color = getTeamColor(event.team);
-                    return `<div class="event-badge" style="background-color: ${color}; border-left: 3px solid ${color};"></div>`;
-                }).join('');
-                
-                div.innerHTML = `
-                    <div class="day-number">${day}</div>
-                    <div class="day-events-container">
-                        ${eventBadges}
-                    </div>
-                    <div class="day-event-count">${events.length} kegiatan</div>
-                `;
+                if (currentCalendarType === 'kegiatan') {
+                    // Kegiatan: colored badges per team
+                    const eventBadges = events.map(event => {
+                        const color = getTeamColor(event.team);
+                        return `<div class="event-badge" style="background-color: ${color}; border-left: 3px solid ${color};"></div>`;
+                    }).join('');
+                    
+                    div.innerHTML = `
+                        <div class="day-number">${day}</div>
+                        <div class="day-events-container">
+                            ${eventBadges}
+                        </div>
+                        <div class="day-event-count">${events.length} kegiatan</div>
+                    `;
+                } else {
+                    // Rencana Aksi: single color badge
+                    const eventBadges = events.map(() => {
+                        return `<div class="event-badge" style="background-color: #10B981; border-left: 3px solid #10B981;"></div>`;
+                    }).join('');
+                    
+                    div.innerHTML = `
+                        <div class="day-number">${day}</div>
+                        <div class="day-events-container">
+                            ${eventBadges}
+                        </div>
+                        <div class="day-event-count">${events.length} rencana</div>
+                    `;
+                }
             } else {
                 div.innerHTML = `<div class="day-number">${day}</div>`;
             }
@@ -3149,7 +3199,8 @@
         }
 
         function getEventsForDate(dateStr) {
-            return allActivities.filter(activity => {
+            const dataSource = currentCalendarType === 'kegiatan' ? allActivities : allRencanaAksi;
+            return dataSource.filter(activity => {
                 return dateStr >= activity.startDate && dateStr <= activity.endDate;
             });
         }
@@ -3159,28 +3210,83 @@
             const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
                               "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             
+            const titleText = currentCalendarType === 'kegiatan' ? 'Kegiatan' : 'Rencana Aksi';
             document.getElementById('dayModalTitle').textContent = 
-                `Kegiatan ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+                `${titleText} ${date.getDate()} ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
 
             let content = '';
             if (events.length === 0) {
-                content = '<div style="text-align: center; padding: 60px 20px; color: var(--text-gray);"><div style="font-size: 64px; margin-bottom: 15px;">📭</div><p>Tidak ada kegiatan pada tanggal ini</p></div>';
+                content = `<div style="text-align: center; padding: 60px 20px; color: var(--text-gray);"><div style="font-size: 64px; margin-bottom: 15px;">📭</div><p>Tidak ada ${titleText.toLowerCase()} pada tanggal ini</p></div>`;
             } else {
                 content = '<div style="display: flex; flex-direction: column; gap: 15px;">';
-                events.forEach(event => {
-                    const teamColor = getTeamColor(event.team);
-                    content += `
-                        <div style="padding: 15px; background: var(--bg-cream); border-radius: 12px; border-left: 4px solid ${teamColor};">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
-                                <h4 style="font-weight: 600; color: var(--text-dark); margin: 0;">${event.name}</h4>
-                                <span style="display: inline-block; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; background: ${teamColor}; color: white;">${event.team}</span>
+                
+                if (currentCalendarType === 'kegiatan') {
+                    // Kegiatan: with team color & delete button
+                    events.forEach(event => {
+                        const teamColor = getTeamColor(event.team);
+                        const activityIndex = allActivities.findIndex(a => 
+                            a.team === event.team && 
+                            a.name === event.name && 
+                            a.startDate === event.startDate && 
+                            a.endDate === event.endDate
+                        );
+                        
+                        content += `
+                            <div style="padding: 15px; background: var(--bg-cream); border-radius: 12px; border-left: 4px solid ${teamColor};">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                                    <div style="flex: 1;">
+                                        <h4 style="font-weight: 600; color: var(--text-dark); margin: 0 0 4px 0;">${event.name}</h4>
+                                        <span style="display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; background: ${teamColor}; color: white;">${event.team}</span>
+                                    </div>
+                                    <button onclick="deleteActivity(${activityIndex})" 
+                                            style="background: #EF4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: all 0.2s;"
+                                            onmouseover="this.style.background='#DC2626'"
+                                            onmouseout="this.style.background='#EF4444'">
+                                        <span>🗑️</span>
+                                        <span>Hapus</span>
+                                    </button>
+                                </div>
+                                <p style="font-size: 13px; color: var(--text-gray); margin: 8px 0 0 0;">
+                                    📅 ${formatDateDisplay(event.startDate)} - ${formatDateDisplay(event.endDate)}
+                                </p>
                             </div>
-                            <p style="font-size: 13px; color: var(--text-gray); margin: 0;">
-                                📅 ${formatDateDisplay(event.startDate)} - ${formatDateDisplay(event.endDate)}
-                            </p>
-                        </div>
-                    `;
-                });
+                        `;
+                    });
+                } else {
+                    // Rencana Aksi: with delete button
+                    events.forEach(event => {
+                        // Find index in allRencanaAksi
+                        const rencanaIndex = allRencanaAksi.findIndex(a => 
+                            a.name === event.name && 
+                            a.startDate === event.startDate && 
+                            a.endDate === event.endDate
+                        );
+                        
+                        content += `
+                            <div style="padding: 15px; background: var(--bg-cream); border-radius: 12px; border-left: 4px solid #10B981;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; gap: 12px; margin-bottom: 8px;">
+                                    <h4 style="font-weight: 600; color: var(--text-dark); margin: 0; flex: 1;">${event.name}</h4>
+                                    <button onclick="deleteRencanaAksi(${rencanaIndex})" 
+                                            style="background: #EF4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: all 0.2s; flex-shrink: 0;"
+                                            onmouseover="this.style.background='#DC2626'"
+                                            onmouseout="this.style.background='#EF4444'">
+                                        <span>🗑️</span>
+                                        <span>Hapus</span>
+                                    </button>
+                                </div>
+                                <p style="font-size: 13px; color: var(--text-gray); margin: 0;">
+                                    📅 ${formatDateDisplay(event.startDate)} - ${formatDateDisplay(event.endDate)}
+                                </p>
+                                ${event.description ? `
+                                    <p style="font-size: 13px; color: var(--text-gray); margin: 8px 0 0 0; padding-top: 8px; border-top: 1px solid #E5E7EB;">
+                                        ${event.description}
+                                    </p>
+                                ` : ''}
+                            </div>
+                        `;
+                    });
+                }
+                
                 content += '</div>';
             }
 
@@ -3189,10 +3295,41 @@
         }
 
         function updateDashboardStats() {
+            // Update selected team monitoring if a team is selected
+            const selectedTeam = document.getElementById('teamSelector')?.value;
+            if (selectedTeam) {
+                updateSelectedTeamMonitoring();
+            }
+        }
+
+        // ========================================
+        // TEAM MONITORING DASHBOARD (DROPDOWN)
+        // ========================================
+        
+        function updateSelectedTeamMonitoring() {
+            const selectedTeam = document.getElementById('teamSelector').value;
+            const container = document.getElementById('teamMonitoringContent');
+            
+            if (!selectedTeam) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 80px 20px; color: var(--text-gray);">
+                        <div style="font-size: 64px; margin-bottom: 15px;">📋</div>
+                        <p style="font-size: 16px; font-weight: 500; margin: 0;">Pilih tim untuk melihat monitoring kegiatan</p>
+                        <p style="font-size: 14px; margin-top: 8px; color: #9CA3AF;">Gunakan dropdown di atas untuk memilih tim</p>
+                    </div>
+                `;
+                return;
+            }
+            
             const year = currentCalendarDate.getFullYear();
             const month = currentCalendarDate.getMonth();
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                              "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             
-            const monthActivities = allActivities.filter(activity => {
+            // Get activities for selected team in current month
+            const teamActivities = allActivities.filter(activity => {
+                if (activity.team !== selectedTeam) return false;
+                
                 const startDate = new Date(activity.startDate);
                 const endDate = new Date(activity.endDate);
                 const monthStart = new Date(year, month, 1);
@@ -3202,15 +3339,365 @@
                        (endDate >= monthStart && endDate <= monthEnd) ||
                        (startDate <= monthStart && endDate >= monthEnd);
             });
-
-            document.getElementById('totalActivities').textContent = monthActivities.length;
-            
-            const uniqueTeams = [...new Set(monthActivities.map(a => a.team))];
-            document.getElementById('activeTeams').textContent = uniqueTeams.length;
             
             const today = new Date();
-            const upcoming = monthActivities.filter(a => new Date(a.startDate) >= today);
-            document.getElementById('upcomingActivities').textContent = upcoming.length;
+            const ongoing = teamActivities.filter(a => {
+                const start = new Date(a.startDate);
+                const end = new Date(a.endDate);
+                return start <= today && end >= today;
+            });
+            
+            const upcoming = teamActivities.filter(a => new Date(a.startDate) > today);
+            const completed = teamActivities.filter(a => new Date(a.endDate) < today);
+            
+            const color = getTeamColor(selectedTeam);
+            
+            let html = `
+                <!-- Team Header Card -->
+                <div style="background: linear-gradient(135deg, ${color}15 0%, ${color}05 100%); padding: 25px; border-radius: 12px; border-left: 4px solid ${color}; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div>
+                            <h3 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 700; color: var(--text-dark);">${selectedTeam}</h3>
+                            <p style="margin: 0; font-size: 14px; color: var(--text-gray);">Periode: ${monthNames[month]} ${year}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 36px; font-weight: 700; color: ${color};">${teamActivities.length}</div>
+                            <div style="font-size: 13px; color: var(--text-gray); font-weight: 500;">Total Kegiatan</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px;">
+                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #10B98115; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                            <div style="width: 40px; height: 40px; background: #10B98115; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">▶️</div>
+                            <div>
+                                <div style="font-size: 28px; font-weight: 700; color: #10B981;">${ongoing.length}</div>
+                                <div style="font-size: 13px; color: var(--text-gray); font-weight: 500;">Berlangsung</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #059669;">Kegiatan sedang berjalan hari ini</div>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #3B82F615; box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                            <div style="width: 40px; height: 40px; background: #3B82F615; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">📅</div>
+                            <div>
+                                <div style="font-size: 28px; font-weight: 700; color: #3B82F6;">${upcoming.length}</div>
+                                <div style="font-size: 13px; color: var(--text-gray); font-weight: 500;">Mendatang</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #2563EB;">Kegiatan yang akan datang</div>
+                    </div>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #6B728015; box-shadow: 0 2px 8px rgba(107, 114, 128, 0.08);">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                            <div style="width: 40px; height: 40px; background: #6B728015; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">✅</div>
+                            <div>
+                                <div style="font-size: 28px; font-weight: 700; color: #6B7280;">${completed.length}</div>
+                                <div style="font-size: 13px; color: var(--text-gray); font-weight: 500;">Selesai</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #4B5563;">Kegiatan yang sudah selesai</div>
+                    </div>
+                </div>
+            `;
+            
+            // Activity List
+            if (teamActivities.length === 0) {
+                html += `
+                    <div style="text-align: center; padding: 60px 20px; background: var(--bg-cream); border-radius: 12px;">
+                        <div style="font-size: 64px; margin-bottom: 15px;">📭</div>
+                        <p style="font-size: 16px; font-weight: 500; color: var(--text-gray); margin: 0;">Tidak ada kegiatan bulan ini</p>
+                        <p style="font-size: 14px; color: #9CA3AF; margin-top: 8px;">Tim ${selectedTeam} belum memiliki kegiatan di ${monthNames[month]} ${year}</p>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #E5E7EB;">
+                        <h4 style="margin: 0 0 15px 0; font-size: 16px; font-weight: 600; color: var(--text-dark);">
+                            📋 Daftar Kegiatan (${teamActivities.length})
+                        </h4>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                `;
+                
+                // Sort by start date
+                teamActivities.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+                
+                teamActivities.forEach((activity, index) => {
+                    const start = new Date(activity.startDate);
+                    const end = new Date(activity.endDate);
+                    const isOngoing = start <= today && end >= today;
+                    const isUpcoming = start > today;
+                    const isCompleted = end < today;
+                    
+                    let statusBadge = '';
+                    let statusColor = '';
+                    
+                    if (isOngoing) {
+                        statusBadge = '▶️ Berlangsung';
+                        statusColor = '#10B981';
+                    } else if (isUpcoming) {
+                        statusBadge = '📅 Mendatang';
+                        statusColor = '#3B82F6';
+                    } else if (isCompleted) {
+                        statusBadge = '✅ Selesai';
+                        statusColor = '#6B7280';
+                    }
+                    
+                    html += `
+                        <div style="background: var(--bg-cream); padding: 15px; border-radius: 10px; border-left: 3px solid ${color};">
+                            <div style="display: flex; justify-content: space-between; align-items: start; gap: 12px; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 200px;">
+                                    <h5 style="margin: 0 0 6px 0; font-size: 15px; font-weight: 600; color: var(--text-dark);">${activity.name}</h5>
+                                    <div style="font-size: 13px; color: var(--text-gray);">
+                                        📅 ${formatDateDisplay(activity.startDate)} - ${formatDateDisplay(activity.endDate)}
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="padding: 6px 12px; background: ${statusColor}15; color: ${statusColor}; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap;">
+                                        ${statusBadge}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // Remove old functions that are no longer needed
+        function updateTeamMonitoring() {
+            // Deprecated - using dropdown now
+        }
+        
+        function filterTeamDashboard(filter) {
+            // Deprecated - using dropdown now
+        }
+        
+        function filterCalendarByTeam(team) {
+            // Deprecated - using dropdown now
+        }
+        
+
+        // ========================================
+        // CALENDAR TYPE SWITCHER
+        // ========================================
+        
+        function switchCalendarType() {
+            const selected = document.getElementById('calendarTypeSwitcher').value;
+            currentCalendarType = selected;
+            
+            // Update title
+            const titleEl = document.getElementById('calendarSectionTitle');
+            const monitoringSection = document.getElementById('monitoringSection');
+            const reminderSection = document.getElementById('reminderSection');
+            const actionButtons = document.getElementById('calendarActionButtons');
+            const btnAddEvent = document.getElementById('btnAddEvent');
+            
+            if (selected === 'kegiatan') {
+                titleEl.innerHTML = '<span class="title-icon">📅</span> Jadwal Kegiatan';
+                monitoringSection.style.display = 'block';
+                reminderSection.style.display = 'none';
+                actionButtons.style.display = 'flex';
+                btnAddEvent.innerHTML = '<span>➕</span><span>Tambah Kegiatan</span>';
+                
+                // Load kegiatan
+                loadCalendarActivities();
+            } else {
+                titleEl.innerHTML = '<span class="title-icon">🎯</span> Jadwal Rencana Aksi Budaya Kerja';
+                monitoringSection.style.display = 'none';
+                reminderSection.style.display = 'block';
+                actionButtons.style.display = 'flex';
+                btnAddEvent.innerHTML = '<span>➕</span><span>Tambah Rencana Aksi</span>';
+                
+                // Load rencana aksi
+                loadRencanaAksi();
+            }
+            
+            renderSamawaCalendar();
+        }
+        
+        async function loadRencanaAksi() {
+            if (!USE_GOOGLE_CALENDAR || !GOOGLE_API_KEY) {
+                console.log('[Rencana Aksi] Using localStorage');
+                loadRencanaAksiFromLocalStorage();
+                updateReminderSection();
+                return;
+            }
+            
+            try {
+                console.log('[Rencana Aksi] Loading from Google Calendar...');
+                allRencanaAksi = [];
+                
+                const startOfMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() - 1, 1);
+                const endOfMonth = new Date(currentCalendarDate.getFullYear(), currentCalendarDate.getMonth() + 2, 0);
+                const timeMin = startOfMonth.toISOString();
+                const timeMax = endOfMonth.toISOString();
+                
+                const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(RENCANA_AKSI_CALENDAR_ID)}/events?key=${GOOGLE_API_KEY}&timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`;
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    console.error('[Rencana Aksi] HTTP error:', response.status);
+                    // Fallback to localStorage
+                    loadRencanaAksiFromLocalStorage();
+                    updateReminderSection();
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (data.items && data.items.length > 0) {
+                    data.items.forEach(event => {
+                        const startDate = event.start.date || event.start.dateTime.split('T')[0];
+                        const endDate = event.end.date || event.end.dateTime.split('T')[0];
+                        const adjustedEndDate = new Date(endDate);
+                        adjustedEndDate.setDate(adjustedEndDate.getDate() - 1);
+                        const finalEndDate = adjustedEndDate.toISOString().split('T')[0];
+                        
+                        allRencanaAksi.push({
+                            id: event.id,
+                            name: event.summary || 'Untitled Event',
+                            startDate: startDate,
+                            endDate: finalEndDate >= startDate ? finalEndDate : startDate,
+                            description: event.description || ''
+                        });
+                    });
+                }
+                
+                // Merge with localStorage data (for locally added items)
+                loadRencanaAksiFromLocalStorage();
+                const localItems = [...allRencanaAksi];
+                const mergedItems = [...data.items || []];
+                
+                // Add local items that don't have 'id' (not from Google Calendar)
+                localItems.forEach(item => {
+                    if (!item.id) {
+                        allRencanaAksi.push(item);
+                    }
+                });
+                
+                console.log('[Rencana Aksi] ✅ Loaded:', allRencanaAksi.length, 'events');
+                updateReminderSection();
+            } catch (error) {
+                console.error('[Rencana Aksi] Error:', error);
+                // Fallback to localStorage
+                loadRencanaAksiFromLocalStorage();
+                updateReminderSection();
+            }
+        }
+        
+        function updateReminderSection() {
+            const container = document.getElementById('reminderContent');
+            if (!container) return;
+            
+            // Get current week (Senin - Minggu)
+            const today = new Date();
+            const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ...
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            monday.setHours(0, 0, 0, 0);
+            
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            sunday.setHours(23, 59, 59, 999);
+            
+            // Filter events this week
+            const thisWeekEvents = allRencanaAksi.filter(event => {
+                const start = new Date(event.startDate);
+                const end = new Date(event.endDate);
+                return (start >= monday && start <= sunday) || 
+                       (end >= monday && end <= sunday) ||
+                       (start <= monday && end >= sunday);
+            });
+            
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                              "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            
+            const weekInfo = `${monday.getDate()} ${monthNames[monday.getMonth()]} - ${sunday.getDate()} ${monthNames[sunday.getMonth()]} ${sunday.getFullYear()}`;
+            
+            let html = `
+                <div style="background: var(--bg-cream); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="font-size: 14px; color: var(--text-gray); margin-bottom: 4px;">Minggu ini:</div>
+                    <div style="font-size: 16px; font-weight: 600; color: var(--text-dark);">${weekInfo}</div>
+                </div>
+            `;
+            
+            if (thisWeekEvents.length === 0) {
+                html += `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--text-gray);">
+                        <div style="font-size: 48px; margin-bottom: 10px;">✅</div>
+                        <p style="font-size: 15px; font-weight: 500; margin: 0;">Tidak ada rencana aksi minggu ini</p>
+                        <p style="font-size: 13px; margin-top: 6px;">Semua berjalan lancar!</p>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                `;
+                
+                thisWeekEvents.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+                
+                thisWeekEvents.forEach((event, index) => {
+                    const start = new Date(event.startDate);
+                    const end = new Date(event.endDate);
+                    const isOngoing = start <= today && end >= today;
+                    const isUpcoming = start > today;
+                    
+                    let statusBadge = '';
+                    let statusColor = '';
+                    let bgColor = '';
+                    
+                    if (isOngoing) {
+                        statusBadge = '▶️ Sedang Berjalan';
+                        statusColor = '#10B981';
+                        bgColor = '#10B98110';
+                    } else if (isUpcoming) {
+                        statusBadge = '📅 Akan Datang';
+                        statusColor = '#3B82F6';
+                        bgColor = '#3B82F610';
+                    } else {
+                        statusBadge = '✅ Selesai';
+                        statusColor = '#6B7280';
+                        bgColor = '#6B728010';
+                    }
+                    
+                    html += `
+                        <div style="background: ${bgColor}; padding: 18px; border-radius: 12px; border-left: 4px solid ${statusColor};">
+                            <div style="display: flex; justify-content: space-between; align-items: start; gap: 12px; flex-wrap: wrap; margin-bottom: 10px;">
+                                <h4 style="margin: 0; font-size: 16px; font-weight: 600; color: var(--text-dark); flex: 1; min-width: 200px;">${event.name}</h4>
+                                <span style="padding: 6px 12px; background: ${statusColor}; color: white; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap;">
+                                    ${statusBadge}
+                                </span>
+                            </div>
+                            <div style="font-size: 14px; color: var(--text-gray);">
+                                📅 ${formatDateDisplay(event.startDate)} - ${formatDateDisplay(event.endDate)}
+                            </div>
+                            ${event.description ? `
+                                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #E5E7EB; font-size: 13px; color: var(--text-gray);">
+                                    ${event.description}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+                
+                html += `
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
         }
 
         function formatDateDisplay(dateStr) {
@@ -3247,7 +3734,22 @@
         // ========================================
         
         function openAddModal() {
-            document.getElementById('addModal').classList.add('active');
+            const modal = document.getElementById('addModal');
+            const modalTitle = modal.querySelector('.modal-title-calendar');
+            const teamSelectGroup = document.getElementById('teamSelect').closest('.form-group-calendar');
+            const submitBtn = modal.querySelector('.btn-primary-calendar');
+            
+            if (currentCalendarType === 'kegiatan') {
+                modalTitle.textContent = 'Tambah Kegiatan Baru';
+                teamSelectGroup.style.display = 'block';
+                submitBtn.textContent = 'Simpan Kegiatan';
+            } else {
+                modalTitle.textContent = 'Tambah Rencana Aksi Baru';
+                teamSelectGroup.style.display = 'none';
+                submitBtn.textContent = 'Simpan Rencana Aksi';
+            }
+            
+            modal.classList.add('active');
             document.getElementById('startDate').valueAsDate = new Date();
             document.getElementById('endDate').valueAsDate = new Date();
         }
@@ -3288,34 +3790,34 @@
                 form.addEventListener('submit', async function(e) {
                     e.preventDefault();
                     
-                    const newActivity = {
-                        team: document.getElementById('teamSelect').value,
-                        name: document.getElementById('activityName').value,
-                        startDate: document.getElementById('startDate').value,
-                        endDate: document.getElementById('endDate').value
-                    };
+                    if (currentCalendarType === 'kegiatan') {
+                        // Tambah Kegiatan
+                        const newActivity = {
+                            team: document.getElementById('teamSelect').value,
+                            name: document.getElementById('activityName').value,
+                            startDate: document.getElementById('startDate').value,
+                            endDate: document.getElementById('endDate').value
+                        };
 
-                    if (USE_CALENDAR_API && CALENDAR_API_URL) {
-                        const saved = await saveToCalendarAPI(newActivity);
-                        
-                        if (saved) {
-                            await loadCalendarActivities();
-                            closeAddModal();
-                            renderSamawaCalendar();
-                            alert('✅ Kegiatan berhasil ditambahkan ke Google Sheets!');
-                        } else {
-                            allActivities.push(newActivity);
-                            saveToLocalStorage();
-                            closeAddModal();
-                            renderSamawaCalendar();
-                            alert('❌ Gagal menyimpan ke Google Sheets. Tersimpan di browser saja.');
-                        }
-                    } else {
                         allActivities.push(newActivity);
                         saveToLocalStorage();
                         closeAddModal();
                         renderSamawaCalendar();
                         alert('✅ Kegiatan berhasil ditambahkan!');
+                    } else {
+                        // Tambah Rencana Aksi
+                        const newRencanaAksi = {
+                            name: document.getElementById('activityName').value,
+                            startDate: document.getElementById('startDate').value,
+                            endDate: document.getElementById('endDate').value
+                        };
+
+                        allRencanaAksi.push(newRencanaAksi);
+                        saveRencanaAksiToLocalStorage();
+                        closeAddModal();
+                        updateReminderSection();
+                        renderSamawaCalendar();
+                        alert('✅ Rencana Aksi berhasil ditambahkan!');
                     }
                 });
             }
@@ -3331,7 +3833,7 @@
         function updateCalendarAPIStatus() {
             const statusEl = document.getElementById('apiStatus');
             if (statusEl) {
-                if (USE_GOOGLE_CALENDAR && GOOGLE_API_KEY !== 'AIzaSyDs6uykI_-bIYwUNGJdvKCtXKlUqVWDOQw') {
+                if (USE_GOOGLE_CALENDAR && GOOGLE_API_KEY) {
                     statusEl.innerHTML = '🟢 Connected to Google Calendar';
                     statusEl.style.color = '#10B981';
                 } else {
@@ -3389,34 +3891,16 @@
                                 endDate: row['Tanggal Selesai']
                             };
 
-                            if (USE_CALENDAR_API && CALENDAR_API_URL) {
-                                const saved = await saveToCalendarAPI(activity);
-                                if (saved) {
-                                    imported++;
-                                } else {
-                                    allActivities.push(activity);
-                                    failed++;
-                                }
-                            } else {
-                                allActivities.push(activity);
-                                imported++;
-                            }
+                            allActivities.push(activity);
+                            imported++;
                         }
                     }
 
-                    if (USE_CALENDAR_API && CALENDAR_API_URL) {
-                        await loadCalendarActivities();
-                    } else {
-                        saveToLocalStorage();
-                    }
-
+                    saveToLocalStorage();
                     renderSamawaCalendar();
                     closeUploadModal();
                     
                     let message = `✅ Berhasil import ${imported} kegiatan dari Excel!`;
-                    if (failed > 0) {
-                        message += `\n⚠️ ${failed} kegiatan gagal ke API, tersimpan di browser.`;
-                    }
                     alert(message);
                 } catch (error) {
                     alert('❌ Gagal membaca file Excel. Pastikan format sesuai template.');
